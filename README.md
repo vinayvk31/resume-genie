@@ -1,39 +1,33 @@
-# 🧠 Resume Genie
+# 📄 Resume Genie
 
-**AI-powered tool that generates personalized cover letters** from your resume and job description using LLMs like Mythomax or Mistral via OpenRouter.  
-Built using **FastAPI**, **React**, and **OpenRouter API**.
-
----
-
-## 🔗 Demo
-
-> Coming soon
+An AI-powered tool that generates personalized cover letters using your resume and a job description — powered by LLMs via OpenRouter.
 
 ---
 
 ## ✨ Features
 
-- 📝 Paste your resume and job description
-- 🤖 Generates a professional, tailored cover letter using LLMs
-- 🚀 Fast responses via OpenRouter (free, no OpenAI billing)
-- 🔐 Secure backend with .env API key handling
-- 📦 Modular structure (React + FastAPI)
+- ✅ FastAPI backend with OpenRouter LLM integration (Mistral)
+- ✅ React + TailwindCSS frontend
+- ✅ Downloadable cover letter as PDF
+- ✅ Clean, responsive UI
+- ✅ Fully deployed backend on Render
 
 ---
 
-## 🛠️ Tech Stack
+## 🚀 Live Demo
 
-- **Frontend**: React, Axios, CSS
-- **Backend**: FastAPI (Python)
-- **LLM Provider**: [OpenRouter.ai](https://openrouter.ai/)
-- **Others**: dotenv, CORS, Postman-tested
+- 🔗 **Backend API**: [https://resume-genie-backend.onrender.com](https://resume-genie-backend.onrender.com)
+- 🌐 **Frontend**: _Running locally_
+---
+
+## 🧠 Tech Stack
+
+| Layer     | Tech Used                        |
+|-----------|----------------------------------|
+| Frontend  | React, TailwindCSS, Axios        |
+| Backend   | FastAPI, Python, Uvicorn         |
+| LLM API   | OpenRouter (Mistral)             |
+| Hosting   | Render (backend), Vercel (optional for frontend) |
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/YOUR-USERNAME/resume-genie.git
-cd resume-genie
