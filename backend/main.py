@@ -1,13 +1,22 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 import requests
 import os
+
 
 load_dotenv()
 
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # or ["*"] for all origins (less secure)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class CoverLetterInput(BaseModel):
     resume: str
