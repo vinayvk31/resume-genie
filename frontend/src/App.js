@@ -13,7 +13,7 @@ function App() {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8000/generate-cover-letter', {
+      const response = await axios.post('https://resume-genie-backend-1.onrender.com/generate-cover-letter', {
         resume: resume,
         job_description: jobDescription
       });
