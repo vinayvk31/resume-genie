@@ -11,6 +11,9 @@
 # production
 /build
 
+# Personal notes
+styling-notes.txt
+
 # misc
 .DS_Store
 .env.local
