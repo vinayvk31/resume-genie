@@ -1,27 +1,54 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from dotenv import load_dotenv
 import requests
+import os
 
-app=FastAPI()
+load_dotenv()
 
-@app.get("/")
-def root():
-    return {"message":"Resume Genie backend is running"}
+API_KEY = os.getenv("OPENROUTER_API_KEY")
+app = FastAPI()
+
+class CoverLetterInput(BaseModel):
+    resume: str
+    job_description: str
 
 @app.post("/generate-cover-letter")
-def generate_cover_letter():
-    prompt = """
-    write a professional, concise cover letter for a Software Engineer applying to a role at Google. The candidate has 4 years of experience in full stack development, Java, React, AWS.
-    """
+def generate_cover_letter(data: CoverLetterInput):
+    prompt = f"""
+Write a cover letter using the following resume and job description:
 
-    response = requests.post(
-        "http://localhost:11434/api/generate",
-        json={
-            "model":"mistral",
-            "prompt":prompt,
-            "stream":False
+Resume:
+{data.resume}
+
+Job Description:
+{data.job_description}
+
+Output only the cover letter.
+"""
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": "https://github.com/your-github-username/resume-genie",  # optional
+        "X-Title": "resume-genie"
+    }
+
+    body = {
+        "model": "gryphe/mythomax-l2-13b",  # Free, fast, high quality
+        "messages": [
+            {"role": "user", "content": prompt}
+        ]
+    }
+
+    try:
+        response = requests.post("https://openrouter.ai/api/v1/chat/completions", headers=headers, json=body)
+        response.raise_for_status()
+        result = response.json()
+
+        return {
+            "cover_letter": result['choices'][0]['message']['content'].strip()
         }
-    )
-    print("Ollama raw response:", response.text)
 
-    result=response.json()
-    return {"cover_letter":result.get("response")}
+    except Exception as e:
+        return {"error": str(e)}
