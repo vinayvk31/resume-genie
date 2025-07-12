@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import './App.css';
+import html2pdf from 'html2pdf.js';
 
 function App() {
   const [resume, setResume] = useState('');
@@ -67,6 +68,20 @@ function App() {
             </div>
           </div>
         )}
+
+        <button
+          onClick={() => {
+            const element = document.getElementById('cover-letter-output');
+            if (element) {
+              setTimeout(() => {
+                html2pdf().from(element).save("cover-letter.pdf");
+              }, 100); // small delay to ensure render
+            }
+          }}
+          className="mt-4 bg-green-600 text-white font-semibold px-4 py-2 rounded hover:bg-green-700"
+        >
+          Download as PDF
+        </button>
       </div>
     </div>
   );
