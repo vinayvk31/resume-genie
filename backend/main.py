@@ -12,7 +12,7 @@ API_KEY = os.getenv("OPENROUTER_API_KEY")
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # or ["*"] for all origins (less secure)
+    allow_origins=["http://localhost:3000","https://resume-genie-frontend-alpha.vercel.app"]  # or ["*"] for all origins (less secure)
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
