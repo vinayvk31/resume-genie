@@ -8,6 +8,8 @@ function App() {
   const [jobDescription, setJobDescription] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [jobDescriptionFile, setJobDescriptionFile] = useState(null);
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -25,6 +27,25 @@ function App() {
     setLoading(false);
   }
 
+  const handleFileUpload = async (file, setStateFn) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('http://localhost:8000/extract-text', formData, {
+        headers: {'Content-Type': 'multipart/form-data'}
+      });
+
+      if(response.data.text) {
+        setStateFn(response.data.text);
+      } else {
+        alert('Failed to extract text from the file.');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Error uploading file. Please try again.');
+    }
+  };
 
   return (
     <div className='min-h-screen bg-gray-50 p-6'>
@@ -38,6 +59,18 @@ function App() {
             value={resume}
             onChange={(e) => setResume(e.target.value)}
           />
+          <input 
+            type="file"
+            accept=".txt,.pdf"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setResumeFile(file);
+                handleFileUpload(file, setResume);
+              }
+            }}
+            className="mt-2 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-md file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          />
         </div>
 
         <div className="mb-4">
@@ -46,6 +79,18 @@ function App() {
             className="w-full h-40 border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
+          />
+          <input 
+            type="file"
+            accept=".txt,.pdf"
+            onChange={(e) => {
+              const file = e.target.files[0];
+              if (file) {
+                setJobDescriptionFile(file);
+                handleFileUpload(file, setJobDescription);
+              }
+            }}
+            className="mt-2 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-md file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </div>
 

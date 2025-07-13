@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 import requests
 import os
+import fitz
 
 
 load_dotenv()
@@ -61,3 +63,30 @@ Output only the cover letter.
 
     except Exception as e:
         return {"error": str(e)}
+
+@app.post("/extract-text")
+async def extract_text(file: UploadFile = File(...)):
+    try:
+        if file.content_type not in ['application/pdf','text/plain']:
+            return JSONResponse(status_code=400, content={"error": "Unsupported file type. Only PDF and text files are allowed."})
+        
+        content = await file.read()
+
+        if file.content_type == 'application/pdf':
+            try:
+                with fitz.open(stream=content, filetype="pdf") as pdf_document:
+                    text = ""
+                    for page in pdf_document:
+                        text += page.get_text()
+            except Exception as e:
+                return JSONResponse(status_code=500, content={"error": f"Failed to extract text from PDF: {str(e)}"})
+        
+        else:
+            try:
+                text = content.decode('utf-8')
+            except Exception as e:
+                return JSONResponse(status_code=500, content={"error": f"Failed to decode text file: {str(e)}"})
+
+        return {"text": text.strip()}
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": f"An error occurred: {str(e)}"})
