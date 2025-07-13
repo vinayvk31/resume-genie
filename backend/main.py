@@ -23,6 +23,7 @@ app.add_middleware(
 class CoverLetterInput(BaseModel):
     resume: str
     job_description: str
+    model: str = "gryphe/mythomax-l2-13b"  # Default model
 
 @app.post("/generate-cover-letter")
 def generate_cover_letter(data: CoverLetterInput):
@@ -41,12 +42,11 @@ Output only the cover letter.
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/your-github-username/resume-genie",  # optional
         "X-Title": "resume-genie"
     }
 
     body = {
-        "model": "gryphe/mythomax-l2-13b",  # Free, fast, high quality
+        "model": data.model, 
         "messages": [
             {"role": "user", "content": prompt}
         ]
