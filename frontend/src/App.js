@@ -4,6 +4,8 @@ import './App.css';
 import html2pdf from 'html2pdf.js';
 
 function App() {
+  const backendURL = process.env.REACT_APP_API_BASE_URL;
+  
   const [resume, setResume] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [coverLetter, setCoverLetter] = useState('');
@@ -11,20 +13,29 @@ function App() {
   const [resumeFile, setResumeFile] = useState(null);
   const [jobDescriptionFile, setJobDescriptionFile] = useState(null);
   const [selectedModel, setSelectedModel] = useState('gryphe/mythomax-l2-13b'); // Default model
+  const [tone, setTone] = useState('professional');
   const models = [
     { value: 'gryphe/mythomax-l2-13b', label: 'Mythomax' },
     { value: 'openai/gpt-3.5-turbo-16k', label: 'GPT-3.5 Turbo 16k' },
     { value: 'mistralai/mistral-7b-instruct', label: 'Mistral' }
+  ];
+  const tones = [
+    { value: 'professional', label: 'Professional' },
+    { value: 'casual', label: 'Casual' },
+    { value: 'enthusiastic', label: 'Enthusiastic' },
+    { value: 'friendly', label: 'Friendly' },
+    { value: 'concise', label: 'Concise' }
   ];
 
   const handleGenerate = async () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('https://resume-genie-backend-1.onrender.com/generate-cover-letter', {
+      const response = await axios.post(`${backendURL}/generate-cover-letter`, {
         resume: resume,
         job_description: jobDescription,
-        model: selectedModel
+        model: selectedModel,
+        tone: tone
       });
       setCoverLetter(response.data.cover_letter);
     } catch (error) {
@@ -39,7 +50,7 @@ function App() {
     formData.append('file', file);
 
     try {
-      const response = await axios.post('http://localhost:8000/extract-text', formData, {
+      const response = await axios.post(`${backendURL}/extract-text`, formData, {
         headers: {'Content-Type': 'multipart/form-data'}
       });
 
@@ -111,6 +122,21 @@ function App() {
             {models.map(model => (
               <option key={model.value} value={model.value}>
                 {model.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <label className="block font-medium mb-2 text-gray-700">Select Tone</label>
+          <select 
+            value={tone}
+            onChange={(e) => setTone(e.target.value)}
+            className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {tones.map(toneOption => (
+              <option key={toneOption.value} value={toneOption.value}>
+                {toneOption.label}
               </option>
             ))}
           </select>

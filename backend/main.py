@@ -24,11 +24,12 @@ class CoverLetterInput(BaseModel):
     resume: str
     job_description: str
     model: str = "gryphe/mythomax-l2-13b"  # Default model
+    tone: str = "professional"
 
 @app.post("/generate-cover-letter")
 def generate_cover_letter(data: CoverLetterInput):
     prompt = f"""
-Write a cover letter using the following resume and job description:
+Write a {data.tone} cover letter using the following resume and job description:
 
 Resume:
 {data.resume}
@@ -67,12 +68,17 @@ Output only the cover letter.
 @app.post("/extract-text")
 async def extract_text(file: UploadFile = File(...)):
     try:
-        if file.content_type not in ['application/pdf','text/plain']:
+        # Accept common iPhone content types
+        allowed_types = ['application/pdf', 'text/plain', 'application/octet-stream']
+        if file.content_type not in allowed_types:
             return JSONResponse(status_code=400, content={"error": "Unsupported file type. Only PDF and text files are allowed."})
-        
+
         content = await file.read()
 
-        if file.content_type == 'application/pdf':
+        # Try to detect PDF by file extension if content_type is ambiguous
+        is_pdf = file.content_type == 'application/pdf' or (file.filename and file.filename.lower().endswith('.pdf'))
+
+        if is_pdf:
             try:
                 with fitz.open(stream=content, filetype="pdf") as pdf_document:
                     text = ""
@@ -80,10 +86,13 @@ async def extract_text(file: UploadFile = File(...)):
                         text += page.get_text()
             except Exception as e:
                 return JSONResponse(status_code=500, content={"error": f"Failed to extract text from PDF: {str(e)}"})
-        
         else:
             try:
-                text = content.decode('utf-8')
+                # Try utf-8, fallback to latin-1 if utf-8 fails
+                try:
+                    text = content.decode('utf-8')
+                except UnicodeDecodeError:
+                    text = content.decode('latin-1')
             except Exception as e:
                 return JSONResponse(status_code=500, content={"error": f"Failed to decode text file: {str(e)}"})
 
