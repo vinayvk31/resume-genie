@@ -10,6 +10,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [resumeFile, setResumeFile] = useState(null);
   const [jobDescriptionFile, setJobDescriptionFile] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('gryphe/mythomax-l2-13b'); // Default model
+  const models = [
+    { value: 'gryphe/mythomax-l2-13b', label: 'Mythomax' },
+    { value: 'openai/gpt-3.5-turbo-16k', label: 'GPT-3.5 Turbo 16k' },
+    { value: 'mistralai/mistral-7b-instruct', label: 'Mistral' }
+  ];
 
   const handleGenerate = async () => {
     setLoading(true);
@@ -17,7 +23,8 @@ function App() {
     try {
       const response = await axios.post('https://resume-genie-backend-1.onrender.com/generate-cover-letter', {
         resume: resume,
-        job_description: jobDescription
+        job_description: jobDescription,
+        model: selectedModel
       });
       setCoverLetter(response.data.cover_letter);
     } catch (error) {
@@ -93,6 +100,21 @@ function App() {
             className="mt-2 block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-md file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
         </div>
+
+        <div className="mb-4">
+          <label className="block font-medium mb-2 text-gray-700">Select Model</label>
+          <select 
+            value={selectedModel}
+            onChange={(e) => setSelectedModel(e.target.value)}
+            className="w-full border border-gray-300 p-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {models.map(model => (
+              <option key={model.value} value={model.value}>
+                {model.label}
+              </option>
+            ))}
+          </select>
+        </div>  
 
         <button
           onClick={handleGenerate}
